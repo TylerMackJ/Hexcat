@@ -1,5 +1,5 @@
 # Hexcat
-A hex display with unicode symbols for specials.
+A hex display with Unicode symbols for specials.
 
 #### USAGE:
   * hexcat [OPTIONS] [FILE]
