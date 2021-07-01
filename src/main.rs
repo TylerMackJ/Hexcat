@@ -130,7 +130,7 @@ fn help() {
     unsafe{ EXIT = true };
 
     println!("\x1b[0;32mhexcat\x1b[0;0m\n\
-    A hex display with unicode symbols for specials.\n\
+    A hex display with Unicode symbols for specials.\n\
     \n\
     \x1b[0;33mUSAGE:\x1b[0;0m\n\
     \t\thexcat [OPTIONS] [FILE]\n\
