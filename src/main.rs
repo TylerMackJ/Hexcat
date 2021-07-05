@@ -4,8 +4,8 @@ use std::io::prelude::*;
 
 struct Arguments {
     path: String,
-    width: Option<String>,
-    group: Option<String>,
+    width: usize,
+    group: usize,
     offset: bool,
     ascii: bool,
 }
@@ -24,30 +24,19 @@ fn main() -> std::io::Result<()> {
         b.unwrap()
     }).collect();
 
-    let width: usize;
-    match args.width {
-        Some(w) => width = w.parse::<usize>().unwrap(),
-        None => width = 16,
-    }
-    let group: usize;
-    match args.group {
-        Some(g) => group = g.parse::<usize>().unwrap(),
-        None => group = 1,
-    }
-
-    for (i, row) in content.chunks(width).enumerate() {
+    for (i, row) in content.chunks(args.width).enumerate() {
         // Print Offset
         if args.offset {
-            print!("0x{:08x}:  ", i * width);
+            print!("0x{:08x}:  ", i * args.width);
         }
 
         // Print Hex
-        for grouping in row.chunks(group) {
+        for grouping in row.chunks(args.group) {
             for byte in grouping {
                 print!("{:02x}", byte);
             }
-            for _ in 0..(group - grouping.len()) {
-                if i != content.chunks(width).len() - 1 {
+            for _ in 0..(args.group - grouping.len()) {
+                if i != content.chunks(args.width).len() - 1 {
                     print!("~~");
                 } else {
                     print!{"  "};
@@ -56,16 +45,16 @@ fn main() -> std::io::Result<()> {
             print!(" ");
         }
         let mut printed_len = row.len();
-        while printed_len % group != 0 {
+        while printed_len % args.group != 0 {
             printed_len += 1;
         }
-        let mut total_len = width;
-        while total_len % group != 0 {
+        let mut total_len = args.width;
+        while total_len % args.group != 0 {
             total_len += 1;
         }
         if printed_len <= total_len {
-            for _ in 0..((total_len - printed_len) / group) {
-                for _ in 0..group {
+            for _ in 0..((total_len - printed_len) / args.group) {
+                for _ in 0..args.group {
                     print!("  ");
                 }
                 print!(" ");
@@ -85,7 +74,7 @@ fn main() -> std::io::Result<()> {
                 }
                 print!("{}", c);
             }
-            for _ in 0..(width - row.len()) {
+            for _ in 0..(args.width - row.len()) {
                 print!(" ");
             }
             print!("|");
@@ -101,8 +90,8 @@ fn handle_args() -> Arguments {
     let mut args: Vec<String> = env::args().collect();
     let mut ret: Arguments = Arguments {
         path: "".to_string(),
-        width: None,
-        group: None,
+        width: 16,
+        group: 1,
         offset: true,
         ascii: true,
     };
@@ -110,8 +99,20 @@ fn handle_args() -> Arguments {
     while args.len() > 1 {
         match args.remove(1) {
             h if h == "-h" => help(),
-            w if args.len() > 1 && w == "-w" && ret.width == None => ret.width = Some(args.remove(1)),
-            g if args.len() > 1 && g == "-g" && ret.group == None => ret.group = Some(args.remove(1)),
+            w if args.len() > 1 && w == "-w" && ret.width == 16 => {
+                match args.remove(1).parse::<isize>() {
+                    Ok(w) if w <= 0 => panic!("\x1b[0;31mError width must be positive.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m"),
+                    Ok(w) => ret.width = w as usize,
+                    Err(_) => panic!("\x1b[0;31mError width undefined.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m"),
+                }
+            },
+            g if args.len() > 1 && g == "-g" && ret.group == 1 => {
+                match args.remove(1).parse::<isize>() {
+                    Ok(g) if g <= 0 => panic!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
+                    Ok(g) => ret.group = g as usize,
+                    Err(_) => panic!("\x1b[0;31mError group size undefined.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
+                }
+            },
             o if o == "-o" && ret.offset == true => ret.offset = false,
             a if a == "-a" && ret.ascii == true => ret.ascii = false,
             path if ret.path == "" => {
