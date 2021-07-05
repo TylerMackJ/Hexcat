@@ -6,6 +6,8 @@ struct Arguments {
     path: String,
     width: usize,
     group: usize,
+    start: usize,
+    end: usize,
     offset: bool,
     ascii: bool,
 }
@@ -23,14 +25,18 @@ fn main() -> std::io::Result<()> {
         Ok(f) => f,
         Err(_) => panic!("\x1b[0;31mError file not found.\x1b[0;0m"),
     };
-    let content: Vec<u8> = file.bytes().map(|b| {
+    let start: usize = args.start;
+    let end: usize = args.end;
+    let content: Vec<u8> = file.bytes().enumerate().filter(|&(i, _)| {
+        i >= start && i < end
+    }).map(|(_, b)| {
         b.unwrap()
     }).collect();
 
     for (i, row) in content.chunks(args.width).enumerate() {
         // Print Offset
         if args.offset {
-            print!("0x{:08x}:  ", i * args.width);
+            print!("0x{:08x}:  ", i * args.width + start);
         }
 
         // Print Hex
@@ -95,6 +101,8 @@ fn handle_args() -> Arguments {
         path: "".to_string(),
         width: 16,
         group: 1,
+        start: 0,
+        end: usize::MAX,
         offset: true,
         ascii: true,
     };
@@ -114,6 +122,20 @@ fn handle_args() -> Arguments {
                     Ok(g) if g <= 0 => panic!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
                     Ok(g) => ret.group = g as usize,
                     Err(_) => panic!("\x1b[0;31mError group size undefined.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
+                }
+            },
+            s if args.len() > 1 && s == "-s" && ret.start == 0 => {
+                match args.remove(1).parse::<isize>() {
+                    Ok(s) if s <= 0 => panic!("\x1b[0;31mError starting position must be positive.\n\x1b[0;33mUSAGE: -s <start>\x1b[0;0m"),
+                    Ok(s) => ret.start = s as usize,
+                    Err(_) => panic!("\x1b[0;31mError starting position undefined.\n\x1b[0;33mUSAGE: -w <start>\x1b[0;0m"),
+                }
+            },
+            e if args.len() > 1 && e == "-e" && ret.end == usize::MAX => {
+                match args.remove(1).parse::<isize>() {
+                    Ok(e) if e <= 0 => panic!("\x1b[0;31mError ending position must be positive.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m"),
+                    Ok(e) => ret.end = e as usize,
+                    Err(_) => panic!("\x1b[0;31mError ending position undefined.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m"),
                 }
             },
             o if o == "-o" && ret.offset == true => ret.offset = false,
