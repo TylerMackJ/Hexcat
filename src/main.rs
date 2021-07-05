@@ -163,7 +163,11 @@ fn help() {
     \n\
     \x1b[0;33mOPTIONS:\x1b[0;0m\n\
     \t\t\x1b[0;32m-w <width>\x1b[0;0m\t\tSet the number of bytes to show per row (default = 16)\n\
-    \t\t\x1b[0;32m-g <grouping>\x1b[0;0m\tSet the number of bytes to group together (default = 1)\n\
+    \t\t\x1b[0;32m-g <grouping>\x1b[0;0m\t\tSet the number of bytes to group together (default = 1)\n\
+    \t\t\x1b[0;32m-s <start>\x1b[0;0m\t\tSet the starting byte (default = 0)\n\
+    \t\t\x1b[0;32m-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
     \t\t\x1b[0;32m-o\x1b[0;0m\t\t\tHide the address offset\n\
-    \t\t\x1b[0;32m-a\x1b[0;0m\t\t\tHide the asciee representation");
+    \t\t\x1b[0;32m-a\x1b[0;0m\t\t\tHide the asciee representation\n\
+    \t\t\x1b[0;32m-h\x1b[0;0m\t\t\tDisplay this menu");
+    
 }
