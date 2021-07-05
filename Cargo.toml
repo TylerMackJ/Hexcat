@@ -1,6 +1,6 @@
 [package]
 name = "hexcat"
-version = "2.1.1"
+version = "2.1.2"
 edition = "2018"
 license-file = "LICENSE"
 description = "A hex display with Unicode symboles for specials."

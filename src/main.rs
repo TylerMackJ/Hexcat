@@ -15,7 +15,10 @@ struct Arguments {
 static mut EXIT: bool = false;
 
 fn main() -> std::io::Result<()> {
-    let args: Arguments = handle_args();
+    let args: Arguments = match handle_args() {
+        Ok(a) => a,
+        Err(_) => return Ok(()),
+    };
 
     if unsafe{ EXIT } {
         return Ok(());
@@ -23,7 +26,10 @@ fn main() -> std::io::Result<()> {
     
     let file: File = match File::open(args.path) {
         Ok(f) => f,
-        Err(_) => panic!("\x1b[0;31mError file not found.\x1b[0;0m"),
+        Err(_) => {
+            eprintln!("\x1b[0;31mError file not found.\x1b[0;0m");
+            return Ok(());
+        },
     };
     let start: usize = args.start;
     let end: usize = args.end;
@@ -95,7 +101,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn handle_args() -> Arguments {
+fn handle_args() -> Result<Arguments, ()> {
     let mut args: Vec<String> = env::args().collect();
     let mut ret: Arguments = Arguments {
         path: "".to_string(),
@@ -109,33 +115,60 @@ fn handle_args() -> Arguments {
 
     while args.len() > 1 {
         match args.remove(1) {
-            h if h == "-h" => help(),
+            h if h == "-h" => {
+                help();
+                return Err(());
+            },
             w if args.len() > 1 && w == "-w" && ret.width == 16 => {
                 match args.remove(1).parse::<isize>() {
-                    Ok(w) if w <= 0 => panic!("\x1b[0;31mError width must be positive.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m"),
+                    Ok(w) if w <= 0 => {
+                        eprintln!("\x1b[0;31mError width must be positive.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m");
+                        return Err(());
+                    },
                     Ok(w) => ret.width = w as usize,
-                    Err(_) => panic!("\x1b[0;31mError width undefined.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m"),
+                    Err(_) => {
+                        eprintln!("\x1b[0;31mError width undefined.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m");
+                        return Err(());
+                    },
                 }
             },
             g if args.len() > 1 && g == "-g" && ret.group == 1 => {
                 match args.remove(1).parse::<isize>() {
-                    Ok(g) if g <= 0 => panic!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
+                    Ok(g) if g <= 0 => {
+                        eprintln!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m");
+                        return Err(());
+                    }
                     Ok(g) => ret.group = g as usize,
-                    Err(_) => panic!("\x1b[0;31mError group size undefined.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m"),
+                    Err(_) => {
+                        eprintln!("\x1b[0;31mError group size undefined.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m");
+                        return Err(());
+                    }
                 }
             },
             s if args.len() > 1 && s == "-s" && ret.start == 0 => {
                 match args.remove(1).parse::<isize>() {
-                    Ok(s) if s <= 0 => panic!("\x1b[0;31mError starting position must be positive.\n\x1b[0;33mUSAGE: -s <start>\x1b[0;0m"),
+                    Ok(s) if s <= 0 => {
+                        eprintln!("\x1b[0;31mError starting position must be positive.\n\x1b[0;33mUSAGE: -s <start>\x1b[0;0m");
+                        return Err(());
+                    }
                     Ok(s) => ret.start = s as usize,
-                    Err(_) => panic!("\x1b[0;31mError starting position undefined.\n\x1b[0;33mUSAGE: -w <start>\x1b[0;0m"),
+                    Err(_) => {
+                        eprintln!("\x1b[0;31mError starting position undefined.\n\x1b[0;33mUSAGE: -w <start>\x1b[0;0m");
+                        return Err(());
+                    }
                 }
             },
             e if args.len() > 1 && e == "-e" && ret.end == usize::MAX => {
                 match args.remove(1).parse::<isize>() {
-                    Ok(e) if e <= 0 => panic!("\x1b[0;31mError ending position must be positive.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m"),
+                    Ok(e) if e <= 0 => {
+                        eprintln!("\x1b[0;31mError ending position must be positive.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m");
+                        return Err(());
+                    }
                     Ok(e) => ret.end = e as usize,
-                    Err(_) => panic!("\x1b[0;31mError ending position undefined.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m"),
+                    Err(_) => {
+                        eprintln!("\x1b[0;31mError ending position undefined.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m");
+                        return Err(());
+                    }
                 }
             },
             o if o == "-o" && ret.offset == true => ret.offset = false,
@@ -144,12 +177,12 @@ fn handle_args() -> Arguments {
                 ret.path = path;
             }
             a => {
-                panic!("\x1b[0;31mError argument unknown '{}'\x1b[0;0m", a);
+                eprintln!("\x1b[0;31mError argument unknown '{}'\x1b[0;0m", a);
+                return Err(());
             }
         }
     }
-
-    ret
+    Ok(ret)
 }
 
 fn help() {
