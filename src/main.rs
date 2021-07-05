@@ -19,7 +19,10 @@ fn main() -> std::io::Result<()> {
         return Ok(());
     }
     
-    let file: File = File::open(args.path)?;
+    let file: File = match File::open(args.path) {
+        Ok(f) => f,
+        Err(_) => panic!("\x1b[0;31mError file not found.\x1b[0;0m"),
+    };
     let content: Vec<u8> = file.bytes().map(|b| {
         b.unwrap()
     }).collect();
@@ -118,8 +121,8 @@ fn handle_args() -> Arguments {
             path if ret.path == "" => {
                 ret.path = path;
             }
-            _ => {
-                panic!("Arguments Incorrect");
+            a => {
+                panic!("\x1b[0;31mError argument unknown '{}'\x1b[0;0m", a);
             }
         }
     }
