@@ -179,13 +179,25 @@ fn parse_with_base(s: String, p: Parsing) -> Result<usize, ()> {
         base = 2;
         number = &s[2..];
     }
+    else if s.ends_with("b") {
+        base = 2;
+        number = &s[..(s.len() - 1)];
+    }
     else if s.starts_with("0o") {
         base = 8;
         number = &s[2..];
     }
+    else if s.ends_with("o") {
+        base = 8;
+        number = &s[..(s.len() - 1)];
+    }
     else if s.starts_with("0x") {
         base = 16;
         number = &s[2..];
+    }
+    else if s.ends_with("x") {
+        base = 16;
+        number = &s[..(s.len() - 1)];
     }
     else {
         base = 10;
@@ -212,27 +224,33 @@ fn help() {
     A hex display with Unicode symbols for specials.\n\
     \n\
     \x1b[0;33mUSAGE:\x1b[0;0m\n\
-    \t\thexcat [OPTIONS] [FILE]\n\
+    \thexcat [OPTIONS] [FILE]\n\
     \n\
     \x1b[0;33mOPTIONS:\x1b[0;0m\n\
-    \t\t\x1b[0;32m--width <width>\n\
-    \t\t-w <width>\x1b[0;0m\t\tSet the number of bytes to show per row (default = 16)\n\
+    \t\x1b[0;32m--width <width>\n\
+    \t-w <width>\x1b[0;0m\t\tSet the number of bytes to show per row (default = 16)\n\
     \n\
-    \t\t\x1b[0;32m--group <grouping>\n\
-    \t\t-g <grouping>\x1b[0;0m\t\tSet the number of bytes to group together (default = 1)\n\
+    \t\x1b[0;32m--group <grouping>\n\
+    \t-g <grouping>\x1b[0;0m\t\tSet the number of bytes to group together (default = 1)\n\
     \n\
-    \t\t\x1b[0;32m--start <start>\n\
-    \t\t-s <start>\x1b[0;0m\t\tSet the starting byte (default = 0)\n\
+    \t\x1b[0;32m--start <start>\n\
+    \t-s <start>\x1b[0;0m\t\tSet the starting byte (default = 0)\n\
     \n\
-    \t\t\x1b[0;32m--end <end>\n\
-    \t\t-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
+    \t\x1b[0;32m--end <end>\n\
+    \t-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
     \n\
-    \t\t\x1b[0;32m--noOffset\n\
-    \t\t-o\x1b[0;0m\t\t\tHide the address offset\n\
+    \t\x1b[0;32m--noOffset\n\
+    \t-o\x1b[0;0m\t\t\tHide the address offset\n\
     \n\
-    \t\t\x1b[0;32m--noAscii\n\
-    \t\t-a\x1b[0;0m\t\t\tHide the ascii representation\n\
+    \t\x1b[0;32m--noAscii\n\
+    \t-a\x1b[0;0m\t\t\tHide the ascii representation\n\
     \n\
-    \t\t\x1b[0;32m--help\n\
-    \t\t-h\x1b[0;0m\t\t\tDisplay this menu");
+    \t\x1b[0;32m--help\n\
+    \t-h\x1b[0;0m\t\t\tDisplay this menu\n\
+    \n\
+    \x1b[0;33mNOTES:\x1b[0;0m\n\
+    \tAll digit based inputs can be prefixed or suffixed for base notation.\n\tSupported prefixes and suffixes:\n\
+    \t\t\x1b[0;33m\tBinary\tOctal\tHex\n\
+    \t\t\x1b[0;33mPrefix\x1b[0;32m\t0b\t0o\t0x\n\
+    \t\t\x1b[0;33mSuffix\x1b[0;32m\tb\to\tx\x1b[0;0m");
 }
