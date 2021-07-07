@@ -115,11 +115,11 @@ fn handle_args() -> Result<Arguments, ()> {
 
     while args.len() > 1 {
         match args.remove(1) {
-            h if h == "-h" => {
+            h if h == "-h" || h == "--help" => {
                 help();
                 return Err(());
             },
-            w if args.len() > 1 && w == "-w" && ret.width == 16 => {
+            w if args.len() > 1 && (w == "-w" || w == "--width") && ret.width == 16 => {
                 match args.remove(1).parse::<isize>() {
                     Ok(w) if w <= 0 => {
                         eprintln!("\x1b[0;31mError width must be positive.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m");
@@ -132,7 +132,7 @@ fn handle_args() -> Result<Arguments, ()> {
                     },
                 }
             },
-            g if args.len() > 1 && g == "-g" && ret.group == 1 => {
+            g if args.len() > 1 && (g == "-g" || g == "--group") && ret.group == 1 => {
                 match args.remove(1).parse::<isize>() {
                     Ok(g) if g <= 0 => {
                         eprintln!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m");
@@ -145,7 +145,7 @@ fn handle_args() -> Result<Arguments, ()> {
                     }
                 }
             },
-            s if args.len() > 1 && s == "-s" && ret.start == 0 => {
+            s if args.len() > 1 && (s == "-s" || s == "--start") && ret.start == 0 => {
                 match args.remove(1).parse::<isize>() {
                     Ok(s) if s <= 0 => {
                         eprintln!("\x1b[0;31mError starting position must be positive.\n\x1b[0;33mUSAGE: -s <start>\x1b[0;0m");
@@ -158,7 +158,7 @@ fn handle_args() -> Result<Arguments, ()> {
                     }
                 }
             },
-            e if args.len() > 1 && e == "-e" && ret.end == usize::MAX => {
+            e if args.len() > 1 && (e == "-e" || e == "--end") && ret.end == usize::MAX => {
                 match args.remove(1).parse::<isize>() {
                     Ok(e) if e <= 0 => {
                         eprintln!("\x1b[0;31mError ending position must be positive.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m");
@@ -171,8 +171,8 @@ fn handle_args() -> Result<Arguments, ()> {
                     }
                 }
             },
-            o if o == "-o" && ret.offset == true => ret.offset = false,
-            a if a == "-a" && ret.ascii == true => ret.ascii = false,
+            o if (o == "-o" || o == "--noOffset") && ret.offset == true => ret.offset = false,
+            a if (a == "-a" || a == "--noAscii") && ret.ascii == true => ret.ascii = false,
             path if ret.path == "" => {
                 ret.path = path;
             }
@@ -195,12 +195,25 @@ fn help() {
     \t\thexcat [OPTIONS] [FILE]\n\
     \n\
     \x1b[0;33mOPTIONS:\x1b[0;0m\n\
-    \t\t\x1b[0;32m-w <width>\x1b[0;0m\t\tSet the number of bytes to show per row (default = 16)\n\
-    \t\t\x1b[0;32m-g <grouping>\x1b[0;0m\t\tSet the number of bytes to group together (default = 1)\n\
-    \t\t\x1b[0;32m-s <start>\x1b[0;0m\t\tSet the starting byte (default = 0)\n\
-    \t\t\x1b[0;32m-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
-    \t\t\x1b[0;32m-o\x1b[0;0m\t\t\tHide the address offset\n\
-    \t\t\x1b[0;32m-a\x1b[0;0m\t\t\tHide the asciee representation\n\
-    \t\t\x1b[0;32m-h\x1b[0;0m\t\t\tDisplay this menu");
+    \t\t\x1b[0;32m--width <width>\n\
+    \t\t-w <width>\x1b[0;0m\t\tSet the number of bytes to show per row (default = 16)\n\
+    \n\
+    \t\t\x1b[0;32m--group <grouping>\n\
+    \t\t-g <grouping>\x1b[0;0m\t\tSet the number of bytes to group together (default = 1)\n\
+    \n\
+    \t\t\x1b[0;32m--start <start>\n\
+    \t\t-s <start>\x1b[0;0m\t\tSet the starting byte (default = 0)\n\
+    \n\
+    \t\t\x1b[0;32m--end <end>\n\
+    \t\t-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
+    \n\
+    \t\t\x1b[0;32m--noOffset\n\
+    \t\t-o\x1b[0;0m\t\t\tHide the address offset\n\
+    \n\
+    \t\t\x1b[0;32m--noAscii\n\
+    \t\t-a\x1b[0;0m\t\t\tHide the ascii representation\n\
+    \n\
+    \t\t\x1b[0;32m--help\n\
+    \t\t-h\x1b[0;0m\t\t\tDisplay this menu");
     
 }

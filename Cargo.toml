@@ -1,10 +1,11 @@
 [package]
 name = "hexcat"
-version = "2.1.2"
+version = "2.2.0"
+authors = ["Tyler Johnson <TylerMackJ@gmail.com>"]
 edition = "2018"
-license-file = "LICENSE"
+license = "GPL-3.0"
 description = "A hex display with Unicode symboles for specials."
 homepage = "https://github.com/TylerMackJ/Hexcat"
 documation = "https://github.com/TylerMackJ/Hexcat"
-respository = "https://github.com/TylerMackJ/Hexcat"
+repository = "https://github.com/TylerMackJ/Hexcat"
 readme = "README.md"
