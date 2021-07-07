@@ -12,6 +12,8 @@ struct Arguments {
     ascii: bool,
 }
 
+enum Parsing { WIDTH, GROUP, START, END }
+
 static mut EXIT: bool = false;
 
 fn main() -> std::io::Result<()> {
@@ -120,55 +122,27 @@ fn handle_args() -> Result<Arguments, ()> {
                 return Err(());
             },
             w if args.len() > 1 && (w == "-w" || w == "--width") && ret.width == 16 => {
-                match args.remove(1).parse::<isize>() {
-                    Ok(w) if w <= 0 => {
-                        eprintln!("\x1b[0;31mError width must be positive.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m");
-                        return Err(());
-                    },
-                    Ok(w) => ret.width = w as usize,
-                    Err(_) => {
-                        eprintln!("\x1b[0;31mError width undefined.\n\x1b[0;33mUSAGE: -w <width>\x1b[0;0m");
-                        return Err(());
-                    },
+                match parse_with_base(args.remove(1), Parsing::WIDTH) {
+                    Ok(w) => ret.width = w,
+                    Err(_) => return Err(()),
                 }
             },
             g if args.len() > 1 && (g == "-g" || g == "--group") && ret.group == 1 => {
-                match args.remove(1).parse::<isize>() {
-                    Ok(g) if g <= 0 => {
-                        eprintln!("\x1b[0;31mError group size must be positive.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m");
-                        return Err(());
-                    }
-                    Ok(g) => ret.group = g as usize,
-                    Err(_) => {
-                        eprintln!("\x1b[0;31mError group size undefined.\n\x1b[0;33mUSAGE: -g <group>\x1b[0;0m");
-                        return Err(());
-                    }
+                match parse_with_base(args.remove(1), Parsing::GROUP) {
+                    Ok(g) => ret.group = g,
+                    Err(_) => return Err(()),
                 }
             },
             s if args.len() > 1 && (s == "-s" || s == "--start") && ret.start == 0 => {
-                match args.remove(1).parse::<isize>() {
-                    Ok(s) if s <= 0 => {
-                        eprintln!("\x1b[0;31mError starting position must be positive.\n\x1b[0;33mUSAGE: -s <start>\x1b[0;0m");
-                        return Err(());
-                    }
-                    Ok(s) => ret.start = s as usize,
-                    Err(_) => {
-                        eprintln!("\x1b[0;31mError starting position undefined.\n\x1b[0;33mUSAGE: -w <start>\x1b[0;0m");
-                        return Err(());
-                    }
+                match parse_with_base(args.remove(1), Parsing::START) {
+                    Ok(s) => ret.start = s,
+                    Err(_) => return Err(()),
                 }
             },
             e if args.len() > 1 && (e == "-e" || e == "--end") && ret.end == usize::MAX => {
-                match args.remove(1).parse::<isize>() {
-                    Ok(e) if e <= 0 => {
-                        eprintln!("\x1b[0;31mError ending position must be positive.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m");
-                        return Err(());
-                    }
-                    Ok(e) => ret.end = e as usize,
-                    Err(_) => {
-                        eprintln!("\x1b[0;31mError ending position undefined.\n\x1b[0;33mUSAGE: -e <end>\x1b[0;0m");
-                        return Err(());
-                    }
+                match parse_with_base(args.remove(1), Parsing::END) {
+                    Ok(e) => ret.end = e,
+                    Err(_) => return Err(()),
                 }
             },
             o if (o == "-o" || o == "--noOffset") && ret.offset == true => ret.offset = false,
@@ -183,6 +157,52 @@ fn handle_args() -> Result<Arguments, ()> {
         }
     }
     Ok(ret)
+}
+
+fn parse_with_base(s: String, p: Parsing) -> Result<usize, ()> {
+    let name: String = match p {
+        Parsing::WIDTH => "width",
+        Parsing::GROUP => "group size",
+        Parsing::START => "starting position",
+        Parsing::END => "ending position",
+    }.to_string();
+    let usage: String = match p {
+        Parsing::WIDTH => "--width (-w) <width>",
+        Parsing::GROUP => "--group (-g) <group size>",
+        Parsing::START => "--start (-s) <starting position>",
+        Parsing::END => "--end (-e) <ending position>",
+    }.to_string();
+
+    let base: u32;
+    let number: &str;
+    if s.starts_with("0b") {
+        base = 2;
+        number = &s[2..];
+    }
+    else if s.starts_with("0o") {
+        base = 8;
+        number = &s[2..];
+    }
+    else if s.starts_with("0x") {
+        base = 16;
+        number = &s[2..];
+    }
+    else {
+        base = 10;
+        number = &s;
+    }
+
+    return match isize::from_str_radix(number, base) {
+        Ok(i) if i <= 0 => {
+            eprintln!("\x1b[0;31mError {} must be positive.\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
+            Err(())
+        },
+        Ok(i) => Ok(i as usize),
+        Err(_) => {
+            eprintln!("\x1b[0;31mError {} undefined.\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
+            Err(())
+        },
+    }
 }
 
 fn help() {
@@ -215,5 +235,4 @@ fn help() {
     \n\
     \t\t\x1b[0;32m--help\n\
     \t\t-h\x1b[0;0m\t\t\tDisplay this menu");
-    
 }
