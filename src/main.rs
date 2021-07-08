@@ -102,9 +102,7 @@ fn main() -> std::io::Result<()> {
             }
             print!("|");
         }
-
         println!("");
     }
-
     Ok(())
 }

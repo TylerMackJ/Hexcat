@@ -108,6 +108,9 @@ fn help() {
     \t\x1b[0;32m--end <end>\n\
     \t-e <end>\x1b[0;0m\t\tSet the ending byte (default = end)\n\
     \n\
+    \t\x1b[0;32m--base <base>\n\
+    \t-b <base>\x1b[0;0m\t\tSet base to output in (options = 2 | 8) (default = 16)\n\
+    \n\
     \t\x1b[0;32m--noOffset\n\
     \t-o\x1b[0;0m\t\t\tHide the address offset\n\
     \n\
