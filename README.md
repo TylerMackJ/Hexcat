@@ -22,6 +22,9 @@ A hex display with Unicode symbols for specials.
     --end
     -e <end>            Set the ending byte (default = end)
 
+    --base
+    -b <base>           Set the base to output in (options = 2 | 8) (default = 16)
+
     --noOffset
     -o                  Hide the address offset
 
