@@ -1,4 +1,4 @@
-pub enum Parsing { WIDTH, GROUP, START, END }
+pub enum Parsing { WIDTH, GROUP, START, END, BASE }
 
 pub fn parse_with_base(s: String, p: Parsing) -> Result<usize, ()> {
     let name: String = match p {
@@ -6,12 +6,14 @@ pub fn parse_with_base(s: String, p: Parsing) -> Result<usize, ()> {
         Parsing::GROUP => "group size",
         Parsing::START => "starting position",
         Parsing::END => "ending position",
+        Parsing::BASE => "base"
     }.to_string();
     let usage: String = match p {
         Parsing::WIDTH => "--width (-w) <width>",
         Parsing::GROUP => "--group (-g) <group size>",
         Parsing::START => "--start (-s) <starting position>",
         Parsing::END => "--end (-e) <ending position>",
+        Parsing::BASE => "--base (-b) <base>",
     }.to_string();
 
     let base: u32;

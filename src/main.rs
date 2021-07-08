@@ -40,13 +40,25 @@ fn main() -> std::io::Result<()> {
         // Print Hex
         for grouping in row.chunks(args.group) {
             for byte in grouping {
-                print!("{:02x}", byte);
+                match args.base {
+                    BaseOption::BIN => print!("{:08b}", byte),
+                    BaseOption::OCT => print!("{:03o}", byte),
+                    BaseOption::HEX => print!("{:02x}", byte),
+                }
             }
             for _ in 0..(args.group - grouping.len()) {
                 if i != content.chunks(args.width).len() - 1 {
-                    print!("~~");
+                    match args.base {
+                        BaseOption::BIN => print!("~~~~~~~~"),
+                        BaseOption::OCT => print!("~~~"),
+                        BaseOption::HEX => print!("~~"),
+                    }
                 } else {
-                    print!{"  "};
+                    match args.base {
+                        BaseOption::BIN => print!("        "),
+                        BaseOption::OCT => print!("   "),
+                        BaseOption::HEX => print!("  "),
+                    }
                 }
             }
             print!(" ");
@@ -62,7 +74,11 @@ fn main() -> std::io::Result<()> {
         if printed_len <= total_len {
             for _ in 0..((total_len - printed_len) / args.group) {
                 for _ in 0..args.group {
-                    print!("  ");
+                    match args.base {
+                        BaseOption::BIN => print!("        "),
+                        BaseOption::OCT => print!("   "),
+                        BaseOption::HEX => print!("  "),
+                    }
                 }
                 print!(" ");
             }

@@ -1,13 +1,16 @@
 use crate::base_tools::*;
 use std::env;
 
+#[derive(std::cmp::PartialEq)]
+pub enum BaseOption { BIN, OCT, HEX }
+
 pub struct Arguments {
     pub path: String,
     pub width: usize,
     pub group: usize,
     pub start: usize,
     pub end: usize,
-    pub base: u8,
+    pub base: BaseOption,
     pub offset: bool,
     pub ascii: bool,
 }
@@ -20,7 +23,7 @@ pub fn handle_args(exit: &mut bool) -> Result<Arguments, ()> {
         group: 1,
         start: 0,
         end: usize::MAX,
-        base: 16,
+        base: BaseOption::HEX,
         offset: true,
         ascii: true,
     };
@@ -56,6 +59,21 @@ pub fn handle_args(exit: &mut bool) -> Result<Arguments, ()> {
                     Err(_) => return Err(()),
                 }
             },
+            b if args.len() > 1 && (b == "-b" || b == "--base") && ret.base == BaseOption::HEX => {
+                match parse_with_base(args.remove(1), Parsing::BASE) {
+                    Ok(b) => {
+                        match b {
+                            8 => ret.base = BaseOption::OCT,
+                            2 => ret.base = BaseOption::BIN,
+                            _ => {
+                                eprintln!("\x1b[0;31mError base must be 2 or 8 (default = 16).\n\x1b[0;33mUSAGE: --base (-b) <base>\x1b[0;0m");
+                                return Err(());
+                            },
+                        }
+                    },
+                    Err(_) => return Err(()),
+                }
+            }
             o if (o == "-o" || o == "--noOffset") && ret.offset == true => ret.offset = false,
             a if (a == "-a" || a == "--noAscii") && ret.ascii == true => ret.ascii = false,
             path if ret.path == "" => {
