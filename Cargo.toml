@@ -1,6 +1,6 @@
 [package]
 name = "hexcat"
-version = "2.3.0"
+version = "2.3.1"
 authors = ["Tyler Johnson <TylerMackJ@gmail.com>"]
 edition = "2018"
 license = "GPL-3.0"
