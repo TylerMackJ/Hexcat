@@ -28,6 +28,11 @@ pub fn handle_args(exit: &mut bool) -> Result<Arguments, ()> {
         ascii: true,
     };
 
+    if args.len() == 1 {
+        eprintln!("\x1b[0;31mERROR: No file provided\n\x1b[0;33mUSAGE: hexcat [OPTIONS] [FILE]\nHINT: hexcat --help (-h) for additional help\x1b[0;0m");
+        return Err(());
+    }
+
     while args.len() > 1 {
         match args.remove(1) {
             h if h == "-h" || h == "--help" => {
@@ -66,7 +71,7 @@ pub fn handle_args(exit: &mut bool) -> Result<Arguments, ()> {
                             8 => ret.base = BaseOption::OCT,
                             2 => ret.base = BaseOption::BIN,
                             _ => {
-                                eprintln!("\x1b[0;31mError base must be 2 or 8 (default = 16).\n\x1b[0;33mUSAGE: --base (-b) <base>\x1b[0;0m");
+                                eprintln!("\x1b[0;31mERROR: Base must be 2 or 8 (default = 16).\n\x1b[0;33mUSAGE: --base (-b) <base>\x1b[0;0m");
                                 return Err(());
                             },
                         }
@@ -80,7 +85,7 @@ pub fn handle_args(exit: &mut bool) -> Result<Arguments, ()> {
                 ret.path = path;
             }
             a => {
-                eprintln!("\x1b[0;31mError argument unknown '{}'\x1b[0;0m", a);
+                eprintln!("\x1b[0;31mERROR: Argument unknown '{}'\x1b[0;0m", a);
                 return Err(());
             }
         }

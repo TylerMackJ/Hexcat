@@ -49,12 +49,12 @@ pub fn parse_with_base(s: String, p: Parsing) -> Result<usize, ()> {
 
     return match isize::from_str_radix(number, base) {
         Ok(i) if i <= 0 => {
-            eprintln!("\x1b[0;31mError {} must be positive.\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
+            eprintln!("\x1b[0;31mERROR: {} must be positive\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
             Err(())
         },
         Ok(i) => Ok(i as usize),
         Err(_) => {
-            eprintln!("\x1b[0;31mError {} undefined.\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
+            eprintln!("\x1b[0;31mERROR: {} undefined\n\x1b[0;33mUSAGE: {}\x1b[0;0m", name, usage);
             Err(())
         },
     }

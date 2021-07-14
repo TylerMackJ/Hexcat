@@ -19,7 +19,7 @@ fn main() -> std::io::Result<()> {
     let file: File = match File::open(args.path) {
         Ok(f) => f,
         Err(_) => {
-            eprintln!("\x1b[0;31mError file not found.\x1b[0;0m");
+            eprintln!("\x1b[0;31mERROR: File not found.\x1b[0;0m");
             return Ok(());
         },
     };
