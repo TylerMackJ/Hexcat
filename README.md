@@ -42,8 +42,9 @@ All digit based inputs can be prefixed or suffixed for base notation.
     Prefix  0b      0o      0x
     Suffix  b       o       x
 
-## INSTALL:
-Currently this project uses AUR to install from a package manager. In the future more systems will be supported. Cargo works as a cross platform replacement.
+## RUN/INSTALL:
+### Nix
+    nix run github:TylerMackj/Hexcat -- <args>
 ### Arch
     pacman -S hexcat-bin
 ### Cargo
